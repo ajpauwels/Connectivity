@@ -19,8 +19,7 @@ let package = Package(
             name: "Connectivity",
             dependencies: ["Reachability"],
             path: "Connectivity/Classes",
-            exclude: ["Reachability"],
-            swiftSettings: [.define("IMPORT_REACHABILITY")]
+            exclude: ["Reachability"]
         ),
         .target(
             name: "Reachability",
