@@ -221,7 +221,7 @@ public extension Connectivity {
     }
     
     var isConnectedViaCellular: Bool {
-        return isConnected(with: ReachableViaWWAN)
+        return isConnected(with: NetworkStatus.ReachableViaWWAN)
     }
     
     var isConnectedViaEthernet: Bool {
@@ -229,11 +229,11 @@ public extension Connectivity {
     }
     
     var isConnectedViaWiFi: Bool {
-        return isConnected(with: ReachableViaWiFi)
+        return isConnected(with: NetworkStatus.ReachableViaWiFi)
     }
     
     var isConnectedViaCellularWithoutInternet: Bool {
-        return isDisconnected(with: ReachableViaWWAN)
+        return isDisconnected(with: NetworkStatus.ReachableViaWWAN)
     }
     
     var isConnectedViaEthernetWithoutInternet: Bool {
@@ -241,7 +241,7 @@ public extension Connectivity {
     }
     
     var isConnectedViaWiFiWithoutInternet: Bool {
-        return isDisconnected(with: ReachableViaWiFi)
+        return isDisconnected(with: NetworkStatus.ReachableViaWiFi)
     }
     
     func checkConnectivity(completion: ((Connectivity) -> Void)? = nil) {
