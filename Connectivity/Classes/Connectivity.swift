@@ -11,9 +11,9 @@ import Network
 #if canImport(UIKit)
 import UIKit
 #endif
-#if IMPORT_REACHABILITY
-import Reachability
-#endif
+// #if IMPORT_REACHABILITY
+// import Reachability
+// #endif
 
 @objcMembers
 public class Connectivity: NSObject {
@@ -144,8 +144,8 @@ public class Connectivity: NSObject {
     /// Status last time a check was performed
     private var previousStatus: ConnectivityStatus = .determining
     
-    /// Reachability instance for checking network adapter status
-    private let reachability: Reachability
+    // /// Reachability instance for checking network adapter status
+    // private let reachability: Reachability
     
     /// Can be used to set a custom validator conforming to `ConnectivityResponseValidator`
     public var responseValidator: ConnectivityResponseValidator =
@@ -193,11 +193,11 @@ public class Connectivity: NSObject {
     
     public init(shouldUseHTTPS: Bool = true) {
         type(of: self).isHTTPSOnly = shouldUseHTTPS
-        self.reachability = Reachability.forInternetConnection()
+        // self.reachability = Reachability.forInternetConnection()
     }
     
     public init(configuration: ConnectivityConfiguration) {
-        self.reachability = Reachability.forInternetConnection()
+        // self.reachability = Reachability.forInternetConnection()
         super.init()
         configure(with: configuration)
     }
@@ -256,11 +256,12 @@ public extension Connectivity {
 #if canImport(UIKit)
         observeApplicationDidBecomeActive()
 #endif
-        if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
-            startPathMonitorNotifier()
-        } else {
-            startReachabilityNotifier()
-        }
+        // if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
+        //     startPathMonitorNotifier()
+        // } else {
+        //     startReachabilityNotifier()
+        // }
+        startPathMonitorNotifier()
     }
     
     @available(OSX 10.14, iOS 12.0, tvOS 12.0, *)
@@ -273,29 +274,30 @@ public extension Connectivity {
         monitor.start(queue: internalQueue)
     }
     
-    private func startReachabilityNotifier() {
-        checkConnectivity()
-        reachability.connectionRequired()
-        reachability.startNotifier()
-        let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(
-            self,
-            selector: #selector(reachabilityDidChange(_:)),
-            name: NSNotification.Name.ReachabilityDidChange,
-            object: nil
-        )
-    }
+    // private func startReachabilityNotifier() {
+    //     checkConnectivity()
+    //     reachability.connectionRequired()
+    //     reachability.startNotifier()
+    //     let notificationCenter = NotificationCenter.default
+    //     notificationCenter.addObserver(
+    //         self,
+    //         selector: #selector(reachabilityDidChange(_:)),
+    //         name: NSNotification.Name.ReachabilityDidChange,
+    //         object: nil
+    //     )
+    // }
     
     /// Stop listening for Reachability changes
     func stopNotifier() {
         timer?.invalidate()
         // swiftlint:disable:next notification_center_detachment
         NotificationCenter.default.removeObserver(self)
-        if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
-            stopPathMonitorNotifier()
-        } else {
-            stopReachabilityNotifier()
-        }
+        // if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
+        //     stopPathMonitorNotifier()
+        // } else {
+        //     stopReachabilityNotifier()
+        // }
+        stopPathMonitorNotifier()
         isObservingInterfaceChanges = false
     }
     
@@ -307,11 +309,11 @@ public extension Connectivity {
         }
     }
     
-    private func stopReachabilityNotifier() {
-        if isObservingInterfaceChanges {
-            reachability.stopNotifier()
-        }
-    }
+    // private func stopReachabilityNotifier() {
+    //     if isObservingInterfaceChanges {
+    //         reachability.stopNotifier()
+    //     }
+    // }
 }
 
 // Private API
@@ -527,16 +529,22 @@ private extension Connectivity {
     
     /// Determines whether connected with the given method.
     func isConnected(with networkStatus: NetworkStatus) -> Bool {
-        if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
-            var isNetworkInterfaceMatch: Bool = false
-            if let monitor = self.pathMonitor as? NWPathMonitor, let interface = interfaceType(from: networkStatus) {
-                isNetworkInterfaceMatch = monitor.currentPath.availableInterfaces.map { $0.type }.contains(interface)
-                return isConnected && isNetworkInterfaceMatch
-            }
-            return false
-        } else {
-            return isConnected && reachability.currentReachabilityStatus() == networkStatus
+        // if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
+        //     var isNetworkInterfaceMatch: Bool = false
+        //     if let monitor = self.pathMonitor as? NWPathMonitor, let interface = interfaceType(from: networkStatus) {
+        //         isNetworkInterfaceMatch = monitor.currentPath.availableInterfaces.map { $0.type }.contains(interface)
+        //         return isConnected && isNetworkInterfaceMatch
+        //     }
+        //     return false
+        // } else {
+        //     return isConnected && reachability.currentReachabilityStatus() == networkStatus
+        // }
+        var isNetworkInterfaceMatch: Bool = false
+        if let monitor = self.pathMonitor as? NWPathMonitor, let interface = interfaceType(from: networkStatus) {
+            isNetworkInterfaceMatch = monitor.currentPath.availableInterfaces.map { $0.type }.contains(interface)
+            return isConnected && isNetworkInterfaceMatch
         }
+        return false
     }
     
     func isConnectedUsingEthernet() -> Bool {
@@ -554,16 +562,22 @@ private extension Connectivity {
     
     /// Determines whether connected with the given method without Internet access (no connectivity).
     func isDisconnected(with networkStatus: NetworkStatus) -> Bool {
-        if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
-            var isNetworkInterfaceMatch: Bool = false
-            if let monitor = self.pathMonitor as? NWPathMonitor, let interface = interfaceType(from: networkStatus) {
-                isNetworkInterfaceMatch = monitor.currentPath.availableInterfaces.map { $0.type }.contains(interface)
-                return !isConnected && isNetworkInterfaceMatch
-            }
-            return false
-        } else {
-            return !isConnected && reachability.currentReachabilityStatus() == networkStatus
+        // if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isNetworkFramework() {
+        //     var isNetworkInterfaceMatch: Bool = false
+        //     if let monitor = self.pathMonitor as? NWPathMonitor, let interface = interfaceType(from: networkStatus) {
+        //         isNetworkInterfaceMatch = monitor.currentPath.availableInterfaces.map { $0.type }.contains(interface)
+        //         return !isConnected && isNetworkInterfaceMatch
+        //     }
+        //     return false
+        // } else {
+        //     return !isConnected && reachability.currentReachabilityStatus() == networkStatus
+        // }
+        var isNetworkInterfaceMatch: Bool = false
+        if let monitor = self.pathMonitor as? NWPathMonitor, let interface = interfaceType(from: networkStatus) {
+            isNetworkInterfaceMatch = monitor.currentPath.availableInterfaces.map { $0.type }.contains(interface)
+            return !isConnected && isNetworkInterfaceMatch
         }
+        return false
     }
     
     func isDisconnectedUsingEthernet() -> Bool {
@@ -713,26 +727,28 @@ private extension Connectivity {
     
     /// Convenience method - updates the connectivity status using info provided by `NetworkStatus`.
     func updateStatus(isConnected: Bool) {
-        switch framework {
-        case .network:
-            if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *) {
-                let monitor = (pathMonitor as? NWPathMonitor) ?? NWPathMonitor()
-                updateStatus(from: monitor.currentPath, isConnected: isConnected)
-            } else { // Fallback to SystemConfiguration framework.
-                let networkStatus = reachability.currentReachabilityStatus()
-                updateStatus(from: networkStatus, isConnected: isConnected)
-            }
-        case .systemConfiguration:
-            let networkStatus = reachability.currentReachabilityStatus()
-            // Reachability can report NotReachable in instances where it is possible to make a connection
-            // - NWPathMonitor can provide a more accurate result.
-            if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isConnected, networkStatus == NotReachable {
-                let monitor = (pathMonitor as? NWPathMonitor) ?? NWPathMonitor()
-                updateStatus(from: monitor.currentPath, isConnected: isConnected)
-            } else {
-                updateStatus(from: networkStatus, isConnected: isConnected)
-            }
-        }
+        // switch framework {
+        // case .network:
+        //     if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *) {
+        //         let monitor = (pathMonitor as? NWPathMonitor) ?? NWPathMonitor()
+        //         updateStatus(from: monitor.currentPath, isConnected: isConnected)
+        //     } else { // Fallback to SystemConfiguration framework.
+        //         let networkStatus = reachability.currentReachabilityStatus()
+        //         updateStatus(from: networkStatus, isConnected: isConnected)
+        //     }
+        // case .systemConfiguration:
+        //     let networkStatus = reachability.currentReachabilityStatus()
+        //     // Reachability can report NotReachable in instances where it is possible to make a connection
+        //     // - NWPathMonitor can provide a more accurate result.
+        //     if #available(OSX 10.14, iOS 12.0, tvOS 12.0, watchOS 5.0, *), isConnected, networkStatus == NotReachable {
+        //         let monitor = (pathMonitor as? NWPathMonitor) ?? NWPathMonitor()
+        //         updateStatus(from: monitor.currentPath, isConnected: isConnected)
+        //     } else {
+        //         updateStatus(from: networkStatus, isConnected: isConnected)
+        //     }
+        // }
+        let monitor = (pathMonitor as? NWPathMonitor) ?? NWPathMonitor()
+        updateStatus(from: monitor.currentPath, isConnected: isConnected)
     }
     
     /// Updates the validator when the validation mode changes.
