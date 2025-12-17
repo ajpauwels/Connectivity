@@ -491,9 +491,9 @@ private extension Connectivity {
     
     func interface(with networkStatus: NetworkStatus) -> ConnectivityInterface {
         switch networkStatus {
-        case ReachableViaWiFi:
+        case .ReachableViaWiFi:
             return .wifi
-        case ReachableViaWWAN:
+        case .ReachableViaWWAN:
             return .cellular
         default:
             return .other
@@ -603,9 +603,9 @@ private extension Connectivity {
     @available(OSX 10.14, iOS 12.0, tvOS 12.0, *)
     private func interfaceType(from networkStatus: NetworkStatus) -> NWInterface.InterfaceType? {
         switch networkStatus {
-        case ReachableViaWiFi:
+        case .ReachableViaWiFi:
             return .wifi
-        case ReachableViaWWAN:
+        case .ReachableViaWWAN:
             return .cellular
         default:
             return nil
@@ -680,9 +680,9 @@ private extension Connectivity {
     func status(from networkStatus: NetworkStatus, isConnected: Bool) -> ConnectivityStatus {
         let currentStatus: ConnectivityStatus
         switch networkStatus {
-        case ReachableViaWWAN:
+        case .ReachableViaWWAN:
             currentStatus = isConnected ? .connectedViaCellular : .connectedViaCellularWithoutInternet
-        case ReachableViaWiFi:
+        case .ReachableViaWiFi:
             currentStatus = isConnected ? .connectedViaWiFi : .connectedViaWiFiWithoutInternet
         default: // Needed as Obj-C Int-backed enum
             currentStatus = isConnected ? .connected : .notConnected
