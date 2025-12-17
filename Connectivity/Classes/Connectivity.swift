@@ -15,6 +15,12 @@ import UIKit
 // import Reachability
 // #endif
 
+enum NetworkStatus: Int {
+    case NotReachable
+    case ReachableViaWiFi
+    case ReachableViaWWAN
+}
+
 @objcMembers
 public class Connectivity: NSObject {
     public typealias Framework = ConnectivityFramework
